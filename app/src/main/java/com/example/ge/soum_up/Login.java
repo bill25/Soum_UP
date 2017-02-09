@@ -339,7 +339,10 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
                 mPasswordView.requestFocus();
             }
         }
+public void upload ()
+{
 
+}
         @Override
         protected void onCancelled() {
             mAuthTask = null;
