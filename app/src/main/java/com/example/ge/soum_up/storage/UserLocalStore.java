@@ -9,9 +9,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
+
+
 import com.example.ge.soum_up.model.User;
 
 public class UserLocalStore {
+
     public static final String SP_Name="userDetails";
 
     SharedPreferences userLocalDatabase;

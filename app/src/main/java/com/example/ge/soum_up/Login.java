@@ -3,9 +3,11 @@ package com.example.ge.soum_up;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -19,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +32,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.ge.soum_up.interfaces.GetUserCallback;
+import com.example.ge.soum_up.model.User;
+import com.example.ge.soum_up.serveur.Serveur;
+import com.example.ge.soum_up.storage.UserLocalStore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +46,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
+    UserLocalStore userLocalStore;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -64,6 +72,7 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
@@ -86,13 +95,46 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+
+                String username = mEmailView.getText().toString();
+                String password = mPasswordView.getText().toString();
+                User user = new User(username, password);
+                authenticate(user);
+
             }
         });
 
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        userLocalStore = new UserLocalStore(this);
     }
+    private void authenticate(User user) {
+        Serveur serverRequest = new Serveur(this);
+        serverRequest.Login(user,  new GetUserCallback() {
+            @Override
+            public void done(User returnedUser) {
+                if (returnedUser == null) {
+                    showErrorMessage();
+                } else {
+                    logUserIn(returnedUser);
+                }
+            }
+        });
+    }
+    private void showErrorMessage() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Login.this);
+        dialogBuilder.setMessage("Incorrect user details");
+        dialogBuilder.setPositiveButton("Ok", null);
+        dialogBuilder.show();
+    }
+    private void logUserIn(User returnedUser) {
+
+        userLocalStore.storeUserData(returnedUser);
+        userLocalStore.setUserLoggedIn(true);
+        startActivity(new Intent(this, MainActivity.class));
+    }
+
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
