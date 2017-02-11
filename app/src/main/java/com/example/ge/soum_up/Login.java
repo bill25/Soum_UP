@@ -319,7 +319,6 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
         mEmailView.setAdapter(adapter);
     }
 
-
     private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
