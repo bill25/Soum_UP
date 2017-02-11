@@ -39,16 +39,13 @@ public class Serveur {
 
   //constructeur
     public Serveur(Context context) {
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setCancelable(false);
-        progressDialog.setTitle("Verification...");
-        progressDialog.setMessage("Please wait...");
+
     }
 
 
 
     public void Login(User user, GetUserCallback userCallBack) {
-        progressDialog.show();
+
         new Login(user, userCallBack).execute();
     }
 
@@ -185,7 +182,6 @@ public class Serveur {
         @Override
         protected void onPostExecute(User returnedUser) {
             super.onPostExecute(returnedUser);
-            progressDialog.dismiss();
             userCallBack.done(returnedUser);
         }
 
